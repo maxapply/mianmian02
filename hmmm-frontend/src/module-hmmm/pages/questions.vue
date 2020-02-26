@@ -87,6 +87,15 @@
         <a href="#">加入精选</a>
       </el-table-column>
       </el-table>
+      <el-pagination
+        :page-size="searchForm.pagesize"
+        :current-page="searchForm.page"
+        @current-change="ages"
+        style="margin-top:20px"
+        background
+        layout="prev, pager, next"
+        :total="total">
+      </el-pagination>
       </el-card>
     </div>
   </div>
@@ -137,8 +146,11 @@ export default {
         city: '',
         keyword: '',
         remarks: '',
-        shortName: ''
-      }
+        shortName: '',
+        page: 1,
+        pagesize: 3
+      },
+       total: 8
     }
   },
   created () {
@@ -151,6 +163,10 @@ export default {
   methods: {
     provinces,
     citys,
+    ages (newagse) {
+      this.searchForm.page = newagse
+      this.getquestionsList()
+    },
     difficultyListFMT (row, column, cellValue, index) {
       return this.difficultyList[cellValue - 1].label
     },
