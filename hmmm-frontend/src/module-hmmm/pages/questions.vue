@@ -2,8 +2,10 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card class="box-card">
+            <el-button type="primary" @click="$router.push('/questions/new')" size="mini">新增试题</el-button>
+            <el-button type="danger" size="mini">批量导入</el-button>
         <!-- 第一行 -->
-        <el-row :gutter="20">
+        <el-row :gutter="20" style="margin-top:10px">
           <el-col :span="6">学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 科：
               <el-select v-model="searchForm.subjectID" placeholder="请选择" class="md">
                 <el-option v-for="item in subjectIDList" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -81,10 +83,12 @@
       <el-table-column prop="difficulty" label="难度" :formatter="difficultyListFMT"></el-table-column>
       <el-table-column prop="creator" label="录入人" ></el-table-column>
       <el-table-column prop="date" label="操作" width="200">
-        <a href="#">预览</a>
-        <a href="#">修改</a>
-        <a href="#">删除</a>
-        <a href="#">加入精选</a>
+        <template slot-scope="stDate">
+          <a href="#">预览</a>
+          <a href="#">修改</a>
+          <a href="#" @click.prevent="removes(stDate.row)">删除</a>
+          <a href="#">加入精选</a>
+        </template>
       </el-table-column>
       </el-table>
       <el-pagination
@@ -104,7 +108,7 @@
 <script>
 import {simple} from '@/api/hmmm/subjects.js'
 import {simple as simpleList} from '@/api/hmmm/tags.js'
-import {list} from '@/api/hmmm/questions.js'
+import {list, remove} from '@/api/hmmm/questions.js'
 import {simple as usersSimple} from '@/api/base/users.js'
 import {simple as directorysSimple} from '@/api/hmmm/directorys.js'
 import {provinces, citys} from '@/api/hmmm/citys.js'
@@ -192,6 +196,18 @@ export default {
     async getquestionsList () {
       const result = await list(this.searchForm)
       this.questionsList = result.data.items
+    },
+    removes (id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const result = await remove(id)
+          this.$message.success('删除成功')
+          this.getquestionsList()
+          }).catch(() => {
+        })
     }
   }
 }
