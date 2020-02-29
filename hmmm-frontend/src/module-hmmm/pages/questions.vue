@@ -2,8 +2,8 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card class="box-card">
-            <el-button type="primary" @click="$router.push('/questions/new')" size="mini">新增试题</el-button>
-            <el-button type="danger" size="mini">批量导入</el-button>
+            <el-button type="primary" @click="$router.push('/questions/new')" size="mini">{{$t('questions.newadd')}}</el-button>
+            <el-button type="danger" size="mini">{{$t('questions.manyadd')}}</el-button>
         <!-- 第一行 -->
         <el-row :gutter="20" style="margin-top:10px">
           <el-col :span="6">学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 科：
@@ -91,14 +91,14 @@
         </template>
       </el-table-column>
       </el-table>
-      <el-pagination
-        :page-size="searchForm.pagesize"
+       <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
         :current-page="searchForm.page"
-        @current-change="ages"
-        style="margin-top:20px"
-        background
-        layout="prev, pager, next"
-        :total="total">
+        :page-sizes="[3, 5, 10, 20]"
+        :page-size="searchForm.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="tot">
       </el-pagination>
       </el-card>
     </div>
@@ -154,7 +154,7 @@ export default {
         page: 1,
         pagesize: 3
       },
-       total: 8
+       tot: 0
     }
   },
   created () {
@@ -167,6 +167,12 @@ export default {
   methods: {
     provinces,
     citys,
+    handleSizeChange (val) {
+     this.searchForm.pagesize = val
+    },
+    handleCurrentChange (val) {
+     this.searchForm.page = val
+    },
     ages (newagse) {
       this.searchForm.page = newagse
       this.getquestionsList()
@@ -196,6 +202,7 @@ export default {
     async getquestionsList () {
       const result = await list(this.searchForm)
       this.questionsList = result.data.items
+      this.tot = result.data.counts
     },
     removes (id) {
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
